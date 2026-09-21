@@ -40,7 +40,7 @@ Manual checklist:
 
 ### GitHub Pages
 
-This folder is static-ready. Point Pages at `/` of a dedicated repo (or `/docs` after copying `dist/`), with `index.html` at the site root. Relative paths (`styles.css`, `app.js`) work on project pages.
+This folder is static-ready. Point Pages at `/` of a dedicated repo (or `/docs` after copying `dist/`), with `index.html` at the site root. Relative paths (`styles.css`, `app.js`) work on project pages. The site footer includes a Fazier launch backlink (`https://fazier.com/`) so the free-listing badge check can see it on the live Pages URL.
 
 ```bash
 npm run build   # optional artifact in dist/
