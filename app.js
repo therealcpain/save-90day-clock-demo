@@ -1,10 +1,15 @@
 /**
- * SAVE 90-Day Transition Clock — paste (1) received servicer 90-day notice?
- * yes/no/unsure, (2) notice date if yes, (3) view date → days left / past deadline /
- * waiting for notice share card + auto-enroll Standard/Tiered Standard literacy.
- * Brand: SAVE 90-Day Transition Clock only. User paste only — no FSA scrape.
+ * SAVE 90-Day Transition Clock — (1) did you receive a servicer 90-day notice?
+ * yes/no/unsure, (2) notice date if yes, (3) date to count from (defaults to today)
+ * → days left / past deadline / waiting for notice share card + auto-enroll
+ * Standard/Tiered Standard explainer.
+ * Brand: SAVE 90-Day Transition Clock only. Uses only what the user types — no FSA scrape.
  * Not plan advice. Not forgiveness advice. Not a servicer tool.
  * Never invents payment $ or a “best” plan. Your notice controls your deadline.
+ *
+ * ui_refresh 2026-09-25: phone-first layout + plain-language copy. Date math, phases,
+ * percentages, validation rules and share-hash format are unchanged from the
+ * previous release (see ui_refresh/checks/equivalence.js).
  */
 (function () {
   "use strict";
@@ -24,66 +29,66 @@
   const FIRST_WAVE_LABEL = "Sep 29 2026";
 
   const CITE_ONE_LINER =
-    "ED: starting July 1, servicers issue 90-day notices; borrowers who do not transition are automatically enrolled into the Standard Repayment Plan or the new Tiered Standard Plan — your specific deadline is on your notice. Business Insider Sep 10 2026: September 29 is the first deadline for certain early-July notice borrowers. Student Loan Planner (ED June 2026 court filing): no borrower required off SAVE until September 29 2026 at the earliest. Literacy only — not plan advice.";
+    "ED: starting July 1, servicers send 90-day notices; borrowers who don’t switch plans are automatically enrolled into the Standard Repayment Plan or the new Tiered Standard Plan — your specific deadline is on your notice. Business Insider Sep 10 2026: September 29 is the first deadline for certain borrowers who got notices in early July. Student Loan Planner (ED June 2026 court filing): no borrower has to leave SAVE until September 29 2026 at the earliest. For understanding only — not plan advice.";
 
   const DISCLAIMER_SHORT =
-    "Not plan advice · not forgiveness advice · not a servicer tool · your notice controls your deadline · never invent payment $ or “best” plan";
+    "Not plan advice · not forgiveness advice · not a servicer tool · your notice controls your deadline · we never invent a payment amount or a “best” plan";
 
-  /** Teaching seeds — labeled. Not live servicer scrapes. */
+  /** Examples — labeled sample dates. Not pulled from any servicer. */
   const SEEDS = [
     {
       id: "jul1-first-wave",
-      label: "Jul 1 notice → Sep 29 first-wave",
-      sub: "Teaching · ~16 days from Sep 13 view",
+      label: "Jul 1 notice → Sep 29 (first wave)",
+      sub: "Example · about 16 days left when checked Sep 13",
       noticeStatus: "yes",
       noticeDate: "2026-07-01",
       viewDate: "2026-09-13",
-      noteLabel: "Jul 1 notice · first-wave teaching seed",
+      noteLabel: "Example: Jul 1 notice (first wave)",
     },
     {
       id: "waiting",
       label: "Waiting for notice",
-      sub: "Teaching · no notice yet · no invented deadline",
+      sub: "Example · no notice yet, so no deadline to show",
       noticeStatus: "no",
       noticeDate: "",
       viewDate: "2026-09-13",
-      noteLabel: "Waiting-for-notice teaching seed",
+      noteLabel: "Example: waiting for notice",
     },
     {
       id: "past-deadline",
       label: "Past deadline",
-      sub: "Teaching · Jul 1 notice · view Oct 1",
+      sub: "Example · Jul 1 notice, checked Oct 1",
       noticeStatus: "yes",
       noticeDate: "2026-07-01",
       viewDate: "2026-10-01",
-      noteLabel: "Past-deadline teaching seed",
+      noteLabel: "Example: past deadline",
     },
     {
       id: "unsure",
-      label: "Unsure notice",
-      sub: "Teaching · check servicer / letter · no invented date",
+      label: "Not sure about a notice",
+      sub: "Example · check your servicer or letter; no date guessed",
       noticeStatus: "unsure",
       noticeDate: "",
       viewDate: "2026-09-13",
-      noteLabel: "Unsure-notice teaching seed",
+      noteLabel: "Example: not sure about notice",
     },
     {
       id: "mid-wave",
-      label: "Mid-wave · Aug 15 notice",
-      sub: "Teaching · later tranche · deadline Nov 13",
+      label: "Later notice · Aug 15",
+      sub: "Example · later wave · deadline Nov 13",
       noticeStatus: "yes",
       noticeDate: "2026-08-15",
       viewDate: "2026-09-13",
-      noteLabel: "Mid-wave later-notice teaching seed",
+      noteLabel: "Example: later notice (Aug 15)",
     },
     {
       id: "empty-miss",
-      label: "Empty / missing dates",
-      sub: "Teaching · notice yes · blank date → honest miss",
+      label: "Missing notice date",
+      sub: "Example · notice = yes but no date entered → we ask for it",
       noticeStatus: "yes",
       noticeDate: "",
       viewDate: "2026-09-13",
-      noteLabel: "Honest-miss teaching seed",
+      noteLabel: "Example: missing notice date",
     },
   ];
 
@@ -153,23 +158,23 @@
         phase: "waiting",
         pill: "Waiting for notice",
         cls: "warn",
-        sub: "No servicer 90-day notice yet · no invented deadline",
+        sub: "No 90-day notice from your servicer yet, so no deadline yet",
         ringLabel: "WAIT",
         daysLabel: "Waiting for notice",
-        headline: "Waiting for your servicer notice",
-        flag: "WAITING FOR NOTICE · we will not invent a deadline before your letter/email arrives",
+        headline: "Waiting for your servicer’s notice",
+        flag: "We can’t give you a deadline until your notice letter or email arrives.",
       };
     }
     if (phase === "unsure") {
       return {
         phase: "unsure",
-        pill: "Unsure · check notice",
+        pill: "Unsure · check your notice",
         cls: "unsure",
-        sub: "Confirm whether you received a 90-day notice",
+        sub: "Check whether you got a 90-day notice",
         ringLabel: "?",
         daysLabel: "Unsure",
-        headline: "Notice status unsure",
-        flag: "NOTICE UNSURE · check your servicer letter/email · we will not invent a deadline",
+        headline: "Not sure if you got a notice",
+        flag: "Check your servicer’s letters and emails. We won’t guess a deadline.",
       };
     }
     if (phase === "countdown") {
@@ -178,7 +183,7 @@
         phase: "countdown",
         pill: n === 1 ? "1 day left" : n + " days left",
         cls: n <= 7 ? "danger" : "ok",
-        sub: "Deadline from your notice date + 90 days",
+        sub: "Deadline = your notice date + 90 days",
         ringLabel: String(n),
         daysLabel: n === 1 ? "1 day left" : n + " days left",
         headline:
@@ -189,9 +194,9 @@
           n +
           " calendar day" +
           (n === 1 ? "" : "s") +
-          " remain until your notice-based deadline (" +
+          " until your deadline (" +
           fmtDate(deadline) +
-          "). Your notice controls — not a public calendar alone.",
+          "). The date on your notice is what counts — not a public calendar alone.",
       };
     }
     if (phase === "today") {
@@ -199,14 +204,14 @@
         phase: "today",
         pill: "Deadline today",
         cls: "danger",
-        sub: "Your notice-based 90-day window ends today",
+        sub: "Your 90-day window from your notice ends today",
         ringLabel: "0",
         daysLabel: "Deadline today",
         headline: "Your 90-day deadline is today",
         flag:
-          "DEADLINE TODAY · notice date + 90 days lands on " +
+          "Your notice date + 90 days lands on " +
           fmtDate(deadline) +
-          " · this card does not enroll you or pick a plan",
+          ". This page doesn’t enroll you or pick a plan.",
       };
     }
     // past
@@ -215,33 +220,32 @@
       phase: "past",
       pill: "Past deadline",
       cls: "danger",
-      sub: "Past your notice-based 90-day deadline",
+      sub: "Your 90-day deadline from your notice has passed",
       ringLabel: "PAST",
       daysLabel: "Past deadline",
-      headline: "Past your notice-based deadline",
+      headline: "Your deadline from your notice has passed",
       flag:
-        "PAST DEADLINE · " +
         elapsed +
         " calendar day" +
         (elapsed === 1 ? "" : "s") +
         " past " +
         fmtDate(deadline) +
-        " · we do not invent a late path or a payment $",
+        ". We don’t make up a late option or a payment amount.",
     };
   }
 
   function autoEnrollStrip() {
-    return "If you do nothing → ED says you are automatically enrolled into the Standard Repayment Plan or the new Tiered Standard Plan. That is ED language — not a plan recommendation from this card.";
+    return "If you do nothing, ED says you are automatically enrolled into the Standard Repayment Plan or the new Tiered Standard Plan. That’s ED’s wording — not a plan recommendation from this page.";
   }
 
   function validate(input) {
     const status = input.noticeStatus || "unsure";
     if (!parseISODate(input.viewDate)) {
-      return "Pick a view date (the day you’re looking) — the clock needs it. We will not invent days left.";
+      return "Pick a date to count from (the view date — usually today). We won’t guess the days left.";
     }
     if (status === "yes") {
       if (!parseISODate(input.noticeDate)) {
-        return "You marked that you received a 90-day notice — paste the notice date from the letter/email. We will not invent a deadline.";
+        return "You said you have a 90-day notice — enter the notice date from the letter or email. We won’t guess a deadline.";
       }
     }
     return null;
@@ -284,13 +288,13 @@
 
     const decoder =
       phase === "waiting"
-        ? "You marked that you have not received a servicer 90-day notice yet. ED: notices started July 1 and continue in waves through late 2026. The earliest public cliff for any borrower is Sep 29 2026 (ED court filing / Student Loan Planner; BI Sep 10). We will not invent your deadline before your notice arrives."
+        ? "You said you haven’t received a 90-day notice from your servicer yet. ED: notices started July 1 and continue in waves through late 2026. The earliest public deadline for any borrower is Sep 29 2026 (ED court filing / Student Loan Planner; Business Insider Sep 10). We won’t guess your deadline before your notice arrives."
         : phase === "unsure"
-          ? "You marked notice status unsure. Check your email / servicer account for a 90-day transition notice. Your specific deadline is the one on your notice — we will not invent it."
-          : "Deadline = your notice date + 90 calendar days (ED framing). This card uses only the date you pasted. It does not log into FSA, pick IBR/PAYE/RAP, or invent a payment $.";
+          ? "You said you’re not sure whether you got a notice. Check your email and servicer account for a 90-day transition notice. Your specific deadline is the one on your notice — we won’t guess it."
+          : "Your deadline = your notice date + 90 calendar days (as ED describes it). This page uses only the date you entered. It does not log in to your FSA (Federal Student Aid) account, pick a plan such as IBR, PAYE or RAP, or make up a payment amount.";
 
     const action =
-      "Calm next step: compare legal repayment options at StudentAid.gov/idr and read studentaid.gov court-actions. Enroll (if you choose) via your servicer / StudentAid.gov — this card does not enroll you and does not recommend a plan.";
+      "Compare legal repayment options at StudentAid.gov/idr and read studentaid.gov court-actions. If you choose a plan, enroll through your servicer or StudentAid.gov — this page does not enroll you and does not recommend a plan.";
 
     return {
       noticeStatus: status,
@@ -308,6 +312,23 @@
       action: action,
       noteLabel: input.noteLabel || "",
     };
+  }
+
+  /** Plain sentence about the public first-wave date, relative to the count-from date. */
+  function firstWaveSentence(firstWaveLeft) {
+    return firstWaveLeft == null
+      ? ""
+      : firstWaveLeft > 0
+        ? " The earliest first-wave deadline, " +
+          FIRST_WAVE_LABEL +
+          ", is " +
+          firstWaveLeft +
+          " day" +
+          (firstWaveLeft === 1 ? "" : "s") +
+          " from the date you picked (a public date — your notice still controls)."
+        : firstWaveLeft === 0
+          ? " The earliest first-wave deadline is today (" + FIRST_WAVE_LABEL + ")."
+          : " The earliest first-wave deadline, " + FIRST_WAVE_LABEL + ", has passed; later notice waves still apply.";
   }
 
   function encodeHash(input) {
@@ -368,11 +389,9 @@
   function syncNoticeDateField() {
     const yes = $("noticeStatus").value === "yes";
     $("noticeDate").disabled = !yes;
-    if (!yes) {
-      // keep value for seed restore when toggling back; UI shows disabled
-    }
+    // Value is kept when hidden so switching back to "yes" restores it.
     const wrap = $("noticeDateWrap");
-    if (wrap) wrap.classList.toggle("dimmed", !yes);
+    if (wrap) wrap.hidden = !yes;
   }
 
   function renderChips() {
@@ -387,106 +406,135 @@
         s.label + '<span class="chip-sub">' + s.sub + "</span>";
       btn.addEventListener("click", () => {
         applyInputs(s);
-        $("status").textContent = "Loaded seed: " + s.label;
-        renderCard();
+        renderCard({ writeHash: true });
+        $("status").textContent = "Showing example: " + s.label;
+        scrollToCard();
       });
       box.appendChild(btn);
     });
   }
 
-  function renderSources() {
-    $("sourceLinks").innerHTML =
-      'Cites: <a href="' +
-      ED_PRESS +
-      '" target="_blank" rel="noopener noreferrer">ED next-steps press release</a>' +
-      '<a href="' +
-      BI_SEP10 +
-      '" target="_blank" rel="noopener noreferrer">Business Insider Sep 10 2026</a>' +
-      '<a href="' +
-      SLP_TIMELINE +
-      '" target="_blank" rel="noopener noreferrer">Student Loan Planner SAVE timeline</a>' +
-      '<a href="' +
-      STUDENTAID_IDR +
-      '" target="_blank" rel="noopener noreferrer">StudentAid.gov/idr</a>' +
-      '<a href="' +
-      STUDENTAID_COURT +
-      '" target="_blank" rel="noopener noreferrer">studentaid.gov court-actions</a>';
+  /** Put text into el, turning known source names into their (existing) links. */
+  const LINKS = [
+    ["studentaid.gov court-actions", STUDENTAID_COURT],
+    ["StudentAid.gov/idr", STUDENTAID_IDR],
+  ];
+  function setLinkedText(el, text) {
+    el.textContent = "";
+    let rest = String(text);
+    while (rest) {
+      let hit = null;
+      LINKS.forEach(([k, url]) => {
+        const i = rest.indexOf(k);
+        if (i !== -1 && (!hit || i < hit.i)) hit = { i: i, k: k, url: url };
+      });
+      if (!hit) {
+        el.appendChild(document.createTextNode(rest));
+        break;
+      }
+      if (hit.i) el.appendChild(document.createTextNode(rest.slice(0, hit.i)));
+      const a = document.createElement("a");
+      a.href = hit.url;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.textContent = hit.k;
+      el.appendChild(a);
+      rest = rest.slice(hit.i + hit.k.length);
+    }
   }
 
-  function renderCard() {
+  function noticeStatusText(status) {
+    return status === "yes" ? "Yes" : status === "no" ? "No — waiting" : "Unsure";
+  }
+
+  function setBig(num, unit, cls, isWord) {
+    $("bigNum").textContent = num;
+    $("bigNum").className = "big-num" + (isWord ? " is-word" : "");
+    $("bigUnit").textContent = unit;
+    $("bigLine").className = "big " + (cls || "");
+  }
+
+  function scrollToCard() {
+    const el = $("cardSection");
+    if (!el || !el.getBoundingClientRect) return;
+    const r = el.getBoundingClientRect();
+    if (r.top < 0 || r.top > window.innerHeight * 0.6) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+
+  /**
+   * opts.writeHash — update the address bar (only after a user action or when the page
+   * was opened from a share link, so a #toggle-goatcounter visit is never overwritten).
+   */
+  function renderCard(opts) {
+    const o = opts || {};
     const input = readInputs();
     const err = validate(input);
+    const hash = encodeHash(input);
+    $("shareUrl").value = location.href.split("#")[0] + hash;
+
     if (err) {
-      $("cardSection").hidden = true;
+      setBig("—", "", "unsure", true);
+      $("deadlineLine").textContent = "";
+      $("daysBar").hidden = true;
+      $("windowLine").textContent = "";
+      $("dlHeadline").textContent = err;
+      $("cardMeta").textContent = "";
       $("status").textContent = err;
-      return;
+      return false;
     }
 
     const c = compute(input);
-    $("cardSection").hidden = false;
-    $("shareBox").hidden = false;
-    $("status").textContent = "Card ready — copy, share, or export PNG.";
+    if (o.announce) {
+      $("status").textContent = "Answer ready — share it, copy it, or save it as an image.";
+    } else if (o.clearStatus) {
+      $("status").textContent = "";
+    }
 
     const metaBits = [];
-    if (c.noticeStatus === "yes" && c.noticeDate) {
-      metaBits.push("Notice: " + fmtDate(c.noticeDate));
-    } else if (c.noticeStatus === "no") {
-      metaBits.push("No notice yet");
-    } else {
-      metaBits.push("Notice: unsure");
-    }
     if (input.noteLabel) metaBits.push(input.noteLabel);
     $("cardMeta").textContent = metaBits.join(" · ");
 
-    $("dlHeadline").textContent = c.clock.headline;
-    $("statusPill").textContent = c.clock.pill;
-    $("statusPill").className = "verdict-k " + c.clock.cls;
-    $("statusSub").textContent = c.clock.sub;
+    // Big answer
+    if (c.phase === "countdown") {
+      setBig(String(c.daysLeft), c.daysLeft === 1 ? "day left" : "days left", c.clock.cls, false);
+    } else if (c.phase === "today") {
+      setBig("Today", "is your deadline", c.clock.cls, true);
+    } else if (c.phase === "past") {
+      setBig(c.clock.daysLabel, "", c.clock.cls, true);
+    } else {
+      setBig(c.clock.daysLabel, "", c.clock.cls, true);
+    }
 
-    $("viewDateDisp").textContent = fmtDate(c.viewDate);
-    $("daysDisp").textContent = c.clock.daysLabel;
     $("deadlineLine").textContent = c.deadline
       ? "Your deadline: " + fmtDate(c.deadline) + " (notice + 90 days)"
-      : "No personal deadline until your notice date is pasted";
+      : "No personal deadline until you enter your notice date";
 
-    $("daysRingDisp").textContent = c.clock.ringLabel;
-    $("daysRing").style.setProperty("--pct", String(c.pct));
-    if (c.phase === "past" || c.phase === "today") {
-      $("daysRing").className = "fee-ring danger";
-    } else if (c.phase === "countdown" && c.daysLeft <= 7) {
-      $("daysRing").className = "fee-ring danger";
-    } else if (c.phase === "countdown") {
-      $("daysRing").className = "fee-ring ok";
-    } else if (c.phase === "waiting") {
-      $("daysRing").className = "fee-ring";
-    } else {
-      $("daysRing").className = "fee-ring empty";
-    }
-
+    // Progress bar (days remaining out of 90)
+    const bar = $("daysBar");
     const windowEl = $("windowLine");
-    if (c.phase === "past") {
-      windowEl.className = "hero-sub danger";
-      windowEl.textContent = "Past your notice-based deadline";
-    } else if (c.phase === "today") {
-      windowEl.className = "hero-sub danger";
-      windowEl.textContent = "Last calendar day of your 90-day window";
-    } else if (c.phase === "countdown") {
-      windowEl.className = "hero-sub warn";
+    if (c.phase === "countdown" || c.phase === "today") {
+      bar.hidden = false;
+      bar.style.setProperty("--pct", String(c.pct));
+      bar.className = "bar " + (c.phase === "today" || c.daysLeft <= 7 ? "danger" : "ok");
       windowEl.textContent =
-        c.daysLeft + " of " + c.span + " days remain in your notice window";
-    } else if (c.phase === "waiting") {
-      windowEl.className = "hero-sub warn";
-      windowEl.textContent = "Waiting — first-wave earliest cliff " + FIRST_WAVE_LABEL;
+        c.phase === "today"
+          ? "Last calendar day of your 90-day window"
+          : c.daysLeft + " of " + c.span + " days remain in your notice window";
     } else {
-      windowEl.className = "hero-sub";
-      windowEl.textContent = "Confirm your notice before trusting any public cliff";
+      bar.hidden = true;
+      windowEl.textContent =
+        c.phase === "past" ? "" : c.phase === "waiting"
+          ? "Waiting — earliest first-wave deadline " + FIRST_WAVE_LABEL
+          : "Confirm your notice before relying on any public date";
     }
 
-    const flag = $("actionFlag");
-    flag.textContent = c.clock.flag;
-    flag.className = "look-enroll-flag " + c.clock.cls;
+    // One sentence of meaning
+    $("dlHeadline").textContent = c.clock.flag;
 
     $("autoEnrollStrip").textContent = c.autoEnroll;
+    setLinkedText($("actionLine"), c.action);
 
     $("rNotice").textContent =
       c.noticeStatus === "yes"
@@ -498,30 +546,13 @@
     $("rFirstWave").textContent = FIRST_WAVE_LABEL;
     $("rView").textContent = fmtDate(c.viewDate);
 
-    const fw =
-      c.firstWaveLeft == null
-        ? ""
-        : c.firstWaveLeft > 0
-          ? " First-wave earliest cliff " +
-            FIRST_WAVE_LABEL +
-            " is " +
-            c.firstWaveLeft +
-            " day" +
-            (c.firstWaveLeft === 1 ? "" : "s") +
-            " from your view date (public callout — your notice still controls)."
-          : c.firstWaveLeft === 0
-            ? " First-wave earliest cliff is today (" + FIRST_WAVE_LABEL + ")."
-            : " First-wave earliest cliff " + FIRST_WAVE_LABEL + " has passed; later notice waves still apply.";
-
-    $("decoderLine").textContent = c.decoder + fw;
-    $("actionLine").textContent = c.action;
+    $("decoderLine").textContent = c.decoder + firstWaveSentence(c.firstWaveLeft);
     $("citeLine").textContent = CITE_ONE_LINER + " " + DISCLAIMER_SHORT + ".";
 
-    const hash = encodeHash(input);
-    if (location.hash !== hash) {
+    if (o.writeHash && location.hash !== hash) {
       history.replaceState(null, "", hash);
     }
-    $("shareUrl").value = location.href.split("#")[0] + hash;
+    return true;
   }
 
   function clearAll() {
@@ -531,10 +562,11 @@
       viewDate: todayISO(),
       noteLabel: "",
     });
-    $("cardSection").hidden = true;
-    $("shareBox").hidden = true;
+    if (location.hash.startsWith("#p=")) {
+      history.replaceState(null, "", location.pathname + location.search);
+    }
+    renderCard({});
     $("status").textContent = "Cleared.";
-    history.replaceState(null, "", location.pathname + location.search);
   }
 
   function summaryText() {
@@ -544,12 +576,12 @@
     const c = compute(input);
     const lines = [
       "SAVE 90-Day Transition Clock",
-      "Notice status: " + c.noticeStatus,
+      "Got a notice: " + noticeStatusText(c.noticeStatus),
       c.noticeDate ? "Notice date: " + fmtDate(c.noticeDate) : null,
-      "View date: " + fmtDate(c.viewDate),
-      c.deadline ? "Deadline (notice + 90): " + fmtDate(c.deadline) : null,
+      "Counting from: " + fmtDate(c.viewDate),
+      c.deadline ? "Deadline (notice + 90 days): " + fmtDate(c.deadline) : null,
       "Status: " + c.clock.pill + " · " + c.clock.sub,
-      "First-wave earliest cliff: " + FIRST_WAVE_LABEL,
+      "Earliest first-wave deadline: " + FIRST_WAVE_LABEL,
       "",
       c.autoEnroll,
       c.decoder,
@@ -561,41 +593,85 @@
     return lines.filter((x) => x != null).join("\n");
   }
 
-  async function copySummary() {
+  /** Clipboard with a fallback for older browsers / non-secure contexts. */
+  async function copyText(text) {
     try {
-      await navigator.clipboard.writeText(summaryText());
-      $("status").textContent = "Summary copied.";
+      if (navigator.clipboard && window.isSecureContext !== false) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
     } catch (e) {
-      $("status").textContent = "Copy failed — select share URL instead.";
+      /* fall through */
+    }
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+      return ok;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function showLinkBox() {
+    const box = $("shareBox");
+    if (box) box.open = true;
+    const inp = $("shareUrl");
+    if (inp) {
+      inp.focus();
+      inp.select();
+    }
+  }
+
+  async function copySummary() {
+    if (await copyText(summaryText())) {
+      $("status").textContent = "Summary copied.";
+    } else {
+      $("status").textContent = "Couldn’t copy — select the link below instead.";
+      showLinkBox();
     }
   }
 
   async function shareLink() {
-    renderCard();
+    if (!renderCard({ writeHash: true })) return;
     const url = $("shareUrl").value;
     try {
       if (navigator.share) {
         await navigator.share({
           title: "SAVE 90-Day Transition Clock",
-          text: "Paste your SAVE 90-day notice date — days left before auto-enroll?",
+          text: "Enter your SAVE 90-day notice date — how many days are left before automatic enrollment?",
           url: url,
         });
         $("status").textContent = "Share sheet opened.";
-      } else {
-        await navigator.clipboard.writeText(url);
-        $("status").textContent = "Share link copied.";
+        return;
       }
     } catch (e) {
-      $("status").textContent = "Share cancelled or unavailable.";
+      if (e && e.name === "AbortError") {
+        $("status").textContent = "Share cancelled.";
+        return;
+      }
+    }
+    if (await copyText(url)) {
+      $("status").textContent = "Link copied — paste it anywhere.";
+    } else {
+      $("status").textContent = "Sharing isn’t available here — copy the link below.";
+      showLinkBox();
     }
   }
 
   async function copyShare() {
-    try {
-      await navigator.clipboard.writeText($("shareUrl").value);
-      $("status").textContent = "Share URL copied.";
-    } catch (e) {
-      $("status").textContent = "Copy failed.";
+    renderCard({ writeHash: true });
+    if (await copyText($("shareUrl").value)) {
+      $("status").textContent = "Link copied.";
+    } else {
+      $("status").textContent = "Couldn’t copy — select the link below.";
+      showLinkBox();
     }
   }
 
@@ -631,6 +707,8 @@
     ctx.closePath();
   }
 
+  const SANS = "system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+
   function exportPng() {
     const input = readInputs();
     const err = validate(input);
@@ -644,105 +722,100 @@
     const W = canvas.width;
     const H = canvas.height;
 
-    ctx.fillStyle = "#0b0f14";
+    // Light, calm image that reads well in a chat thread.
+    ctx.fillStyle = "#f6f6f3";
     ctx.fillRect(0, 0, W, H);
-    const g = ctx.createLinearGradient(0, 0, W, H);
-    g.addColorStop(0, "rgba(240,180,41,0.14)");
-    g.addColorStop(0.55, "rgba(0,0,0,0)");
-    g.addColorStop(1, "rgba(62,207,142,0.08)");
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, W, H);
-
-    ctx.fillStyle = "#121820";
-    roundRect(ctx, 36, 36, W - 72, H - 72, 18);
+    ctx.fillStyle = "#ffffff";
+    roundRect(ctx, 36, 36, W - 72, H - 72, 24);
     ctx.fill();
-    ctx.strokeStyle = "#2e3a48";
+    ctx.strokeStyle = "#d5dae0";
     ctx.lineWidth = 2;
     ctx.stroke();
 
-    let y = 78;
-    ctx.fillStyle = "#8b9aab";
-    ctx.font = "600 18px IBM Plex Sans, system-ui, sans-serif";
-    ctx.fillText("SAVE 90-Day Transition Clock", 64, y);
-    y += 36;
-
-    ctx.fillStyle = "#e8eef5";
-    ctx.font = "700 34px IBM Plex Sans, system-ui, sans-serif";
-    y = wrapText(ctx, c.clock.headline, 64, y, W - 128, 40);
-    y += 18;
-
-    // Giant days-left / status badge (text-primary)
-    ctx.fillStyle = "#1a2330";
-    roundRect(ctx, 64, y, W - 128, 120, 14);
-    ctx.fill();
-    ctx.fillStyle =
-      c.clock.cls === "danger"
-        ? "#ff6b6b"
-        : c.clock.cls === "ok"
-          ? "#3ecf8e"
-          : "#f0b429";
-    ctx.font = "700 56px IBM Plex Mono, monospace";
-    ctx.fillText(c.clock.daysLabel, 88, y + 72);
-    ctx.fillStyle = "#8b9aab";
-    ctx.font = "500 18px IBM Plex Sans, system-ui, sans-serif";
-    ctx.fillText(c.clock.sub, 88, y + 102);
+    let y = 90;
+    ctx.fillStyle = "#4a5360";
+    ctx.font = "600 22px " + SANS;
+    ctx.fillText("SAVE 90-Day Transition Clock", 72, y);
+    y += 30;
+    if (input.noteLabel) {
+      ctx.font = "400 20px " + SANS;
+      ctx.fillText(input.noteLabel, 72, y);
+    }
     y += 140;
 
-    ctx.fillStyle = "#e8eef5";
-    ctx.font = "600 20px IBM Plex Sans, system-ui, sans-serif";
-    ctx.fillText("Status: " + c.clock.pill, 64, y);
-    y += 32;
+    const color =
+      c.clock.cls === "danger" ? "#b0261d" : c.clock.cls === "ok" ? "#1b7340" : c.clock.cls === "warn" ? "#85560a" : "#16191d";
+    ctx.fillStyle = color;
+    if (c.phase === "countdown") {
+      ctx.font = "800 140px " + SANS;
+      const num = String(c.daysLeft);
+      ctx.fillText(num, 68, y);
+      const w = ctx.measureText(num).width;
+      ctx.fillStyle = "#16191d";
+      ctx.font = "700 40px " + SANS;
+      ctx.fillText(c.daysLeft === 1 ? "day left" : "days left", 68 + w + 20, y);
+    } else {
+      ctx.font = "800 72px " + SANS;
+      y = wrapText(ctx, c.clock.daysLabel, 68, y - 40, W - 144, 80) - 40;
+    }
+    y += 60;
 
-    ctx.fillStyle = "#b8c4d0";
-    ctx.font = "400 18px IBM Plex Sans, system-ui, sans-serif";
-    const meta =
-      "View " +
-      fmtDate(c.viewDate) +
-      (c.noticeDate ? " · Notice " + fmtDate(c.noticeDate) : "") +
-      (c.deadline ? " · Deadline " + fmtDate(c.deadline) : "") +
-      " · First-wave cliff " +
-      FIRST_WAVE_LABEL;
-    y = wrapText(ctx, meta, 64, y, W - 128, 26);
+    ctx.fillStyle = "#16191d";
+    ctx.font = "700 30px " + SANS;
+    y = wrapText(
+      ctx,
+      c.deadline
+        ? "Your deadline: " + fmtDate(c.deadline) + " (notice + 90 days)"
+        : "No personal deadline until you enter your notice date",
+      72, y, W - 144, 38
+    );
+    y += 14;
+
+    ctx.fillStyle = "#16191d";
+    ctx.font = "400 24px " + SANS;
+    y = wrapText(ctx, c.clock.flag, 72, y, W - 144, 32);
     y += 18;
 
-    ctx.fillStyle = "#1a2330";
-    roundRect(ctx, 64, y, W - 128, 110, 12);
+    ctx.fillStyle = "#fff5dc";
+    roundRect(ctx, 64, y, W - 128, 150, 16);
     ctx.fill();
-    ctx.fillStyle = "#f0b429";
-    ctx.font = "600 16px IBM Plex Sans, system-ui, sans-serif";
-    ctx.fillText("Auto-enroll literacy (ED language)", 88, y + 28);
-    ctx.fillStyle = "#e8eef5";
-    ctx.font = "400 16px IBM Plex Sans, system-ui, sans-serif";
-    y = wrapText(ctx, c.autoEnroll, 88, y + 52, W - 176, 22);
-    y += 36;
+    ctx.strokeStyle = "#e2bd5b";
+    ctx.stroke();
+    ctx.fillStyle = "#16191d";
+    ctx.font = "400 22px " + SANS;
+    wrapText(ctx, c.autoEnroll, 88, y + 40, W - 176, 30);
+    y += 180;
 
-    ctx.fillStyle = "#b8c4d0";
-    ctx.font = "400 16px IBM Plex Sans, system-ui, sans-serif";
-    y = wrapText(ctx, c.clock.flag, 64, y, W - 128, 22);
-    y += 12;
-    y = wrapText(ctx, c.action, 64, y, W - 128, 22);
-    y += 20;
+    ctx.fillStyle = "#16191d";
+    ctx.font = "700 22px " + SANS;
+    ctx.fillText("What to do next", 72, y);
+    y += 32;
+    ctx.font = "400 21px " + SANS;
+    y = wrapText(ctx, c.action, 72, y, W - 144, 29);
+    y += 16;
 
-    ctx.fillStyle = "#8b9aab";
-    ctx.font = "400 14px IBM Plex Sans, system-ui, sans-serif";
-    y = wrapText(ctx, CITE_ONE_LINER, 64, y, W - 128, 20);
-    y += 24;
+    ctx.fillStyle = "#4a5360";
+    ctx.font = "400 19px " + SANS;
+    const meta =
+      "Counting from " +
+      fmtDate(c.viewDate) +
+      (c.noticeDate ? " · Notice " + fmtDate(c.noticeDate) : "") +
+      " · Earliest first-wave deadline " +
+      FIRST_WAVE_LABEL;
+    y = wrapText(ctx, meta, 72, y, W - 144, 26);
 
-    ctx.fillStyle = "#ff6b6b";
-    ctx.font = "600 15px IBM Plex Sans, system-ui, sans-serif";
-    y = wrapText(ctx, DISCLAIMER_SHORT, 64, y, W - 128, 20);
-
-    ctx.fillStyle = "#5a6a7a";
-    ctx.font = "400 13px IBM Plex Sans, system-ui, sans-serif";
+    ctx.fillStyle = "#4a5360";
+    ctx.font = "400 17px " + SANS;
+    wrapText(ctx, DISCLAIMER_SHORT, 72, H - 110, W - 144, 24);
     ctx.fillText(
-      "User-pasted notice · no FSA login · StudentAid.gov/idr · court-actions",
-      64,
-      H - 56
+      "Uses only the date you entered · no FSA login · StudentAid.gov/idr · court-actions",
+      72,
+      H - 60
     );
 
     canvas.toBlob(function (blob) {
       if (!blob) {
-        $("status").textContent = "PNG export failed.";
+        $("status").textContent = "Couldn’t create the image.";
         return;
       }
       const a = document.createElement("a");
@@ -755,7 +828,7 @@
         ".png";
       a.click();
       URL.revokeObjectURL(a.href);
-      $("status").textContent = "PNG downloaded.";
+      $("status").textContent = "Image saved.";
     });
   }
 
@@ -763,10 +836,18 @@
     if (!$("viewDate").value) $("viewDate").value = todayISO();
     syncNoticeDateField();
     renderChips();
-    renderSources();
 
-    $("noticeStatus").addEventListener("change", syncNoticeDateField);
-    $("cardBtn").addEventListener("click", renderCard);
+    const live = () => renderCard({ writeHash: true, clearStatus: true });
+    $("noticeStatus").addEventListener("change", () => {
+      syncNoticeDateField();
+      live();
+    });
+    ["noticeDate", "viewDate"].forEach((id) => $(id).addEventListener("change", live));
+    $("noteLabel").addEventListener("input", live);
+    $("cardBtn").addEventListener("click", () => {
+      renderCard({ writeHash: true, announce: true });
+      scrollToCard();
+    });
     $("clearBtn").addEventListener("click", clearAll);
     $("copySummary").addEventListener("click", copySummary);
     $("shareBtn").addEventListener("click", shareLink);
@@ -777,14 +858,17 @@
       const p = decodeHash();
       if (p) {
         applyInputs(p);
-        renderCard();
+        renderCard({ writeHash: true });
       }
     });
 
     const fromHash = decodeHash();
     if (fromHash) {
       applyInputs(fromHash);
-      renderCard();
+      renderCard({ writeHash: true });
+    } else {
+      // Show an answer straight away with the default inputs (today’s date).
+      renderCard({});
     }
   }
 
@@ -811,8 +895,14 @@
       validate: validate,
       compute: compute,
       fmtDate: fmtDate,
+      firstWaveSentence: firstWaveSentence,
       DISCLAIMER_SHORT: DISCLAIMER_SHORT,
       CITE_ONE_LINER: CITE_ONE_LINER,
+      ED_PRESS: ED_PRESS,
+      BI_SEP10: BI_SEP10,
+      SLP_TIMELINE: SLP_TIMELINE,
+      STUDENTAID_IDR: STUDENTAID_IDR,
+      STUDENTAID_COURT: STUDENTAID_COURT,
     };
   }
 })();
