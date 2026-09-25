@@ -28,186 +28,157 @@
           async src="//gc.zgo.at/count.js"></script>
   <title>SAVE 90-Day Transition Clock — notice date → days left before auto-enroll</title>
   <meta name="description" content="Paste whether you received a servicer 90-day SAVE notice, the notice date if yes, and today’s view date. One shareable card: days left / past deadline / waiting for notice, auto-enroll Standard or Tiered Standard literacy, Sep 29 2026 first-wave cliff. Cite ED / BI / Student Loan Planner. Not plan advice.">
-  <meta name="theme-color" content="#0b0f14">
   <meta property="og:title" content="SAVE 90-Day Transition Clock">
   <meta property="og:description" content="Paste your SAVE 90-day notice date — days left before auto-enroll? Cite ED. Not plan advice.">
   <meta property="og:type" content="website">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#111418" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
   <link rel="stylesheet" href="styles.css">
   <script src="app.js" defer></script>
 </head>
 <body>
   <div class="wrap">
     <header class="site">
-      <div class="brand">
-        <div class="brand-mark" aria-hidden="true">90d</div>
-        <div>
-          <h1>SAVE 90-Day Transition Clock</h1>
-          <p class="tagline">Paste notice flag + date → days left / past / waiting · auto-enroll literacy · share card.</p>
-        </div>
-      </div>
-      <span class="badge">Not plan advice</span>
+      <p class="eyebrow">SAVE 90-Day Transition Clock <span class="badge">Not plan advice</span></p>
+      <h1>How many days are left on my SAVE plan notice?</h1>
     </header>
 
-    <aside class="myth-banner" role="note">
-      <strong>Disclaimer.</strong>
-      This card is <em>calendar literacy</em> —
-      <strong>not</strong> plan advice, <strong>not</strong> forgiveness advice, <strong>not</strong> a servicer tool, and <strong>not</strong> a determination of your payment.
-      <strong>Your notice controls your deadline.</strong> We never invent a payment $ or a “best” plan.
-      Public ED framing: starting July&nbsp;1, servicers issue notices instructing SAVE borrowers to enroll in a legal repayment plan <strong>within 90 days</strong>; borrowers who do not transition are <strong>automatically enrolled into the Standard Repayment Plan or the new Tiered Standard Plan</strong>.
-      First-wave earliest cliff: <strong>Sep&nbsp;29&nbsp;2026</strong> (ED court filing / Student Loan Planner; Business Insider Sep&nbsp;10&nbsp;2026).
-      Compare options at
-      <a href="https://studentaid.gov/idr" target="_blank" rel="noopener noreferrer">StudentAid.gov/idr</a>
-      ·
-      <a href="https://studentaid.gov/announcements-events/court-actions" target="_blank" rel="noopener noreferrer">studentaid.gov court-actions</a>.
-      Sources:
-      <a href="https://www.ed.gov/about/news/press-release/us-department-of-education-announces-next-steps-borrowers-enrolled-unlawful-save-plan" target="_blank" rel="noopener noreferrer">ED next-steps press release</a>
-      ·
-      <a href="https://www.businessinsider.com/student-loan-borrowers-forced-most-expensive-repayment-plan-save-transition-2026-9" target="_blank" rel="noopener noreferrer">Business Insider Sep 10 2026</a>
-      ·
-      <a href="https://www.studentloanplanner.com/save-plan-transition-timeline/" target="_blank" rel="noopener noreferrer">Student Loan Planner SAVE timeline</a>.
-    </aside>
+    <div class="layout">
+      <section class="panel ask" aria-labelledby="ask-heading">
+        <h2 id="ask-heading" class="sr-only">Your notice</h2>
 
-    <section class="panel lookup" aria-labelledby="lookup-heading">
-      <h2 id="lookup-heading">1. Paste your notice status</h2>
-      <p class="hint">
-        User paste only — <strong>no</strong> FSA login, <strong>no</strong> servicer scrape.
-        If you received a 90-day notice, paste the <strong>notice date</strong> from the letter/email. Deadline = notice date + 90 days.
-        Empty or missing dates → honest miss (we will not invent a deadline).
-      </p>
-
-      <div class="field-grid four">
-        <div>
-          <label for="noticeStatus">Received servicer 90-day notice?</label>
+        <div class="field">
+          <label for="noticeStatus">Did your loan servicer send you a 90-day SAVE notice?</label>
           <select id="noticeStatus">
-            <option value="unsure">Unsure / check letter</option>
+            <option value="unsure">Not sure — I need to check my letter</option>
             <option value="yes">Yes — I have a notice</option>
-            <option value="no">No — waiting for notice</option>
+            <option value="no">No — still waiting for a notice</option>
           </select>
         </div>
-        <div id="noticeDateWrap">
-          <label for="noticeDate">Notice date (if yes)</label>
+
+        <div class="field" id="noticeDateWrap">
+          <label for="noticeDate">Date on your notice</label>
           <input id="noticeDate" type="date" />
+          <p class="field-hint">From the letter or email. Your deadline = notice date + 90 days.</p>
         </div>
-        <div>
-          <label for="viewDate">View date (when you’re looking)</label>
-          <input id="viewDate" type="date" required />
-        </div>
-        <div>
-          <label for="noteLabel">Note label (optional)</label>
-          <input id="noteLabel" type="text" maxlength="64" placeholder="e.g. Redacted · family chat" autocomplete="off" />
-        </div>
-      </div>
 
-      <div class="actions">
-        <button type="button" class="btn btn-primary" id="cardBtn" onclick="window.goatcounter &amp;&amp; goatcounter.count({path: '/cta/generate', title: 'Generate card', event: true})">Show transition clock</button>
-        <button type="button" class="btn" id="clearBtn">Clear</button>
-      </div>
-      <p class="status" id="status" aria-live="polite"></p>
+        <details class="more">
+          <summary>Change the date or add a label</summary>
+          <div class="more-body">
+            <div class="field">
+              <label for="viewDate">Count the days from</label>
+              <input id="viewDate" type="date" required />
+              <p class="field-hint">Starts as today’s date.</p>
+            </div>
+            <div class="field">
+              <label for="noteLabel">Label for your card (optional)</label>
+              <input id="noteLabel" type="text" maxlength="64" placeholder="e.g. Mom’s loan" autocomplete="off" />
+            </div>
+          </div>
+        </details>
 
-      <h3 class="subhead">Seed examples (teaching dates)</h3>
-      <div class="seed-chips" id="seedChips" role="list" aria-label="Seed SAVE 90-day clock examples"></div>
-    </section>
-
-    <section class="panel card-panel" aria-labelledby="card-heading" id="cardSection" hidden>
-      <div class="card-toolbar">
-        <h2 id="card-heading">2. Shareable transition clock</h2>
         <div class="actions">
+          <button type="button" class="btn btn-primary" id="cardBtn" onclick="window.goatcounter &amp;&amp; goatcounter.count({path: '/cta/generate', title: 'Generate card', event: true})">Show my days left</button>
+          <button type="button" class="btn btn-quiet" id="clearBtn">Start over</button>
+        </div>
+        <p class="status" id="status" aria-live="polite"></p>
+      </section>
+
+      <section class="answer" id="cardSection" aria-labelledby="card-heading">
+        <h2 id="card-heading" class="sr-only">Your answer</h2>
+        <article class="card" id="deadlineCard" aria-labelledby="dlHeadline" aria-live="polite">
+          <div class="card-top">
+            <p class="card-brand">SAVE 90-Day Transition Clock</p>
+            <p class="card-meta" id="cardMeta"></p>
+          </div>
+
+          <p class="big" id="bigLine"><span class="big-num" id="bigNum">—</span><span class="big-unit" id="bigUnit"></span></p>
+          <p class="key-date" id="deadlineLine">Notice date + 90 days</p>
+          <div class="bar" id="daysBar" hidden><span></span></div>
+          <p class="bar-caption" id="windowLine"></p>
+
+          <h3 class="meaning" id="dlHeadline">Days left on your 90-day clock?</h3>
+
+          <p class="caution" id="autoEnrollStrip">
+            If you do nothing, you are automatically enrolled in Standard or Tiered Standard (ED’s wording — not our recommendation).
+          </p>
+
+          <p class="next"><span class="next-k">What to do next</span><span id="actionLine">Compare options at StudentAid.gov/idr.</span></p>
+
+          <dl class="facts" id="receiptStrip" aria-label="Your dates">
+            <div><dt>Your notice</dt><dd id="rNotice">—</dd></div>
+            <div><dt>Your deadline</dt><dd id="rDeadline">—</dd></div>
+            <div><dt>Earliest first-wave deadline</dt><dd id="rFirstWave">Sep 29 2026</dd></div>
+            <div><dt>Counting from</dt><dd id="rView">—</dd></div>
+          </dl>
+
+          <p class="card-disclaimer">For understanding the calendar only. Not plan advice · your notice controls your deadline · we never invent a payment amount or a “best” plan.</p>
+        </article>
+
+        <div class="actions share-actions">
+          <button type="button" class="btn btn-primary" id="shareBtn">Share</button>
+          <button type="button" class="btn" id="copyShare">Copy link</button>
           <button type="button" class="btn" id="copySummary">Copy summary</button>
-          <button type="button" class="btn" id="shareBtn">Share link</button>
-          <button type="button" class="btn" id="pngBtn">Export PNG</button>
+          <button type="button" class="btn" id="pngBtn">Save as image</button>
         </div>
-      </div>
 
-      <!-- PRIMARY VISUAL: countdown card — giant days-left / past / waiting badge -->
-      <article class="renewal-card" id="deadlineCard" aria-labelledby="dlHeadline">
-        <header class="card-head">
-          <div>
-            <p class="brand-line">SAVE 90-Day Transition Clock</p>
-            <p class="meta-line" id="cardMeta">—</p>
-            <h3 id="dlHeadline">Days left on your 90-day clock?</h3>
+        <details class="share-box" id="shareBox">
+          <summary>Show the link</summary>
+          <label for="shareUrl" class="sr-only">Link to this answer</label>
+          <div class="row">
+            <input id="shareUrl" type="text" readonly />
           </div>
-          <div class="verdict" id="statusBadge">
-            <span class="verdict-k" id="statusPill">—</span>
-            <span class="verdict-s" id="statusSub">Text-labeled · not color-only</span>
-          </div>
-        </header>
+          <p class="field-hint">The link reopens this page with the same answers filled in. When posting, you can add tracking tags, e.g. <code>?utm_source=reddit&amp;utm_medium=organic&amp;utm_campaign=save_90day_clock_mvp</code></p>
+        </details>
+      </section>
 
-        <div class="hero-row">
-          <div class="hero-stat cy-lead">
-            <span class="hero-kicker">Your notice clock</span>
-            <div class="face-allin-line" aria-label="Days left badge">
-              <span class="face-was"><span class="face-was-k">View date</span> <span id="viewDateDisp">—</span></span>
-              <span class="face-arrow" aria-hidden="true">→</span>
-              <span class="hero-value" id="daysDisp">—</span>
+      <div class="below">
+        <section class="panel">
+          <details class="fold" id="howItWorks">
+            <summary><h2>How this works</h2></summary>
+            <div class="fold-body">
+              <p class="dyn" id="decoderLine">—</p>
+              <ul class="explain-list">
+                <li>Starting July&nbsp;1, loan servicers send notices telling SAVE borrowers to enroll in a legal repayment plan <strong>within 90 days</strong> (as the Education Department, ED, describes it publicly). Borrowers who don’t switch are <strong>automatically enrolled into the Standard Repayment Plan or the new Tiered Standard Plan</strong>.</li>
+                <li><strong>Days left</strong> counts from the date you picked to <strong>your notice date + 90 days</strong>, when you say you have a notice. The words carry the meaning, not just the color: days left, <strong>Past deadline</strong>, or <strong>Waiting for notice</strong>.</li>
+                <li><strong>Earliest first-wave deadline:</strong> <strong>Sep&nbsp;29&nbsp;2026</strong> (ED court filing / Student Loan Planner; Business Insider Sep&nbsp;10&nbsp;2026). Later notice waves have later deadlines — your notice still controls.</li>
+                <li>If you do nothing, ED says you go into <strong>Standard or Tiered Standard</strong>. That’s ED’s wording — <em>not</em> a plan recommendation from this page.</li>
+                <li>Compare options at StudentAid.gov/idr and read studentaid.gov court-actions. This page does not enroll you.</li>
+                <li>We only use what you type in — <strong>no</strong> FSA login, and we <strong>don’t</strong> pull anything from your servicer. If a date is missing, we won’t guess a deadline.</li>
+                <li>This page explains the calendar only — <strong>not</strong> plan advice, <strong>not</strong> forgiveness advice, <strong>not</strong> a servicer tool, and <strong>not</strong> a decision about your payment. <strong>Your notice controls your deadline.</strong> We never invent your payment amount or a “best” plan.</li>
+              </ul>
+              <h3 class="sr-only">Sources</h3>
+              <p><strong>Compare options and sources</strong></p>
+              <ul class="source-list" id="sourceLinks">
+                <li><a href="https://studentaid.gov/idr" target="_blank" rel="noopener noreferrer">StudentAid.gov/idr</a></li>
+                <li><a href="https://studentaid.gov/announcements-events/court-actions" target="_blank" rel="noopener noreferrer">studentaid.gov court-actions</a></li>
+                <li><a href="https://www.ed.gov/about/news/press-release/us-department-of-education-announces-next-steps-borrowers-enrolled-unlawful-save-plan" target="_blank" rel="noopener noreferrer">ED next-steps press release</a></li>
+                <li><a href="https://www.businessinsider.com/student-loan-borrowers-forced-most-expensive-repayment-plan-save-transition-2026-9" target="_blank" rel="noopener noreferrer">Business Insider Sep 10 2026</a></li>
+                <li><a href="https://www.studentloanplanner.com/save-plan-transition-timeline/" target="_blank" rel="noopener noreferrer">Student Loan Planner SAVE timeline</a></li>
+              </ul>
+              <p class="cite-line" id="citeLine">—</p>
             </div>
-            <span class="hero-sub" id="deadlineLine">Notice date + 90 days</span>
-          </div>
-          <div class="hero-stat fee ring-stat">
-            <span class="hero-kicker">Days-left badge</span>
-            <div class="ring-wrap" aria-hidden="true">
-              <div class="fee-ring" id="daysRing" style="--pct:0"></div>
-              <div class="ring-center">
-                <span class="hero-value" id="daysRingDisp">—</span>
-              </div>
+          </details>
+        </section>
+
+        <section class="panel">
+          <details class="fold" id="examples">
+            <summary><h2>Examples</h2></summary>
+            <div class="fold-body">
+              <p class="field-hint">Sample dates to see how the clock works. Tap one to load it.</p>
+              <div class="seed-chips" id="seedChips" role="list" aria-label="SAVE 90-day clock examples"></div>
             </div>
-            <span class="hero-sub" id="windowLine">—</span>
-          </div>
-        </div>
-
-        <p class="look-enroll-flag" id="actionFlag" aria-live="polite">—</p>
-
-        <p class="look-enroll-flag warn" id="autoEnrollStrip" aria-live="polite">
-          If you do nothing → Standard or Tiered Standard (ED language — not a plan recommendation).
-        </p>
-
-        <div class="receipt-strip four" id="receiptStrip" aria-label="Status breakdown">
-          <div class="r-item"><span class="r-k">Notice</span><span class="r-v" id="rNotice">—</span></div>
-          <div class="r-item"><span class="r-k">Your deadline</span><span class="r-v" id="rDeadline">—</span></div>
-          <div class="r-item"><span class="r-k">First-wave cliff</span><span class="r-v" id="rFirstWave">Sep 29 2026</span></div>
-          <div class="r-item"><span class="r-k">View date</span><span class="r-v" id="rView">—</span></div>
-        </div>
-
-        <p class="decoder-line" id="decoderLine">—</p>
-        <p class="action-line" id="actionLine">—</p>
-        <p class="cite-line" id="citeLine">—</p>
-
-        <footer class="card-foot">
-          <span>User-pasted notice · no FSA login</span>
-          <span>Not plan advice · your notice controls · no invented payment $</span>
-        </footer>
-      </article>
-
-      <div class="share-box" id="shareBox" hidden>
-        <label for="shareUrl">Share URL (hash restores your pasted fields)</label>
-        <div class="row">
-          <input id="shareUrl" type="text" readonly />
-          <button type="button" class="btn" id="copyShare" style="flex:0 0 auto">Copy</button>
-        </div>
-        <p class="hint">Append UTM when you post, e.g. <code>?utm_source=reddit&amp;utm_medium=organic&amp;utm_campaign=save_90day_clock_mvp</code></p>
+          </details>
+        </section>
       </div>
+    </div>
 
-      <div class="source-links" id="sourceLinks"></div>
-    </section>
-
-    <section class="panel legend" aria-labelledby="legend-heading">
-      <h2 id="legend-heading">How to read the card</h2>
-      <ul class="legend-list">
-        <li><span class="pill allin">Days left</span> From <strong>your view date</strong> to <strong>notice date + 90 days</strong> when you marked notice = yes. Text carries meaning (not color-only): days left, <strong>Past deadline</strong>, or <strong>Waiting for notice</strong>.</li>
-        <li><span class="pill fee">First-wave cliff</span> Public earliest callout: <strong>Sep&nbsp;29&nbsp;2026</strong> (ED / BI / Student Loan Planner). Later notice waves have later deadlines — your notice still controls.</li>
-        <li><span class="pill claim">Auto-enroll</span> ED language: if you do nothing → <strong>Standard or Tiered Standard</strong>. That is literacy — <em>not</em> a plan recommendation from this card.</li>
-        <li><strong>Pointers</strong> Compare options at StudentAid.gov/idr · read studentaid.gov court-actions. This card does not enroll you.</li>
-        <li><strong>No invented $.</strong> We never invent your payment amount or a “best” plan. Empty/missing dates = honest miss.</li>
-      </ul>
-    </section>
-
-    <footer>
-      <strong>SAVE 90-Day Transition Clock</strong> — notice-honest share card for the SAVE 90-day transition.
+    <footer class="site-foot">
+      <strong>SAVE 90-Day Transition Clock</strong> — a shareable card for the SAVE 90-day transition, based on your notice.
       <ul>
-        <li>Notice yes/no/unsure · notice date · view date → days left / past / waiting</li>
-        <li>User paste only · zero scrape · not plan advice · not forgiveness advice · not a servicer tool</li>
+        <li>Notice yes / no / not sure · notice date · date to count from → days left / past deadline / waiting</li>
+        <li>Uses only what you type in · no data pulled · not plan advice · not forgiveness advice · not a servicer tool</li>
         <li>Free utility · ad-supported path (see README)</li>
       </ul>
       <p class="fazier-launch-badge">
